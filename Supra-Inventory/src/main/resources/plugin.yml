@@ -1,0 +1,24 @@
+name: Supra-Inventory
+version: '${project.version}'
+main: fr.chilli.Main
+api-version: 1.19
+authors: [ Jules ]
+description: A complete plugin to allow player to save inventory with a new way of storage with high speed
+
+commands:
+  transfer:
+    description: Send money from your account to your bank
+  create:
+    description: Creation of your bank
+  delete:
+    description: Delete your bank
+  retire:
+    description: Withdraw money from your bank to your account
+  solde:
+    description: See how much money you have in your bank
+  trust:
+    description: Add a member to the bank
+  untrust:
+    description: Removes a member from the bank
+  quitter:
+    description: Leave a bank

@@ -1,0 +1,10 @@
+fr\chilli\commands\RetirerCommand.class
+fr\chilli\commands\UntrustCommand.class
+fr\chilli\util\DataSaver.class
+fr\chilli\commands\QuitterCommand.class
+fr\chilli\Main.class
+fr\chilli\commands\SoldeCommand.class
+fr\chilli\commands\TrustCommand.class
+fr\chilli\commands\TransfertCommand.class
+fr\chilli\commands\CreateCommand.class
+fr\chilli\commands\DeleteCommand.class

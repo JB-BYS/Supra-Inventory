@@ -1,0 +1,24 @@
+name: Soldat-Tavern
+version: '1.0-SNAPSHOT'
+main: fr.chilli.Main
+api-version: 1.19
+authors: [ Jules ]
+description: Un plugin d'ajout de monstre
+
+commands:
+  transfer:
+    description: Envoie l'argent de ton compte vers ta banque
+  create:
+    description: Création de ta banque
+  delete:
+    description: Supprime ta banque
+  retire:
+    description: Retire l'argent de ta banque vers ton compte
+  solde:
+    description: Regarde combien d'argent tu as  sur ta banque
+  trust:
+    description: Ajoute un membre à la banque
+  untrust:
+    description: Supprime un membre de la banque
+  quitter:
+    description: Quitte une bank

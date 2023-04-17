@@ -7,7 +7,9 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Bank {
@@ -66,9 +68,6 @@ public class Bank {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(bankFile);
         return config.getString("owner");
     }
-    public void quit (Player player){
-
-    }
 
     public void setOwner(String newOwnerName, Player oldOwnerName) {
 
@@ -118,4 +117,83 @@ public class Bank {
 
         return (double) config.get("money");
     }
+
+    public void trust(String bankName,UUID playerUUID) {
+        if (playerUUID == null) {
+            return;
+        }
+
+        File bankFile = new File(DATA_FOLDER, bankName + ".yml");
+        YamlConfiguration bankConfig = YamlConfiguration.loadConfiguration(bankFile);
+        List<String> memberList = bankConfig.getStringList("members");
+        memberList.add(playerUUID.toString());
+        bankConfig.set("members", memberList);
+        try {
+            bankConfig.save(bankFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void untrust(String bankName,UUID playerUUID) {
+        if (playerUUID == null) {
+            return;
+        }
+
+        File bankFile = new File(DATA_FOLDER, bankName + ".yml");
+        YamlConfiguration bankConfig = YamlConfiguration.loadConfiguration(bankFile);
+        List<String> memberList = bankConfig.getStringList("members");
+        memberList.remove(playerUUID.toString());
+        bankConfig.set("members", memberList);
+        try {
+            bankConfig.save(bankFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isTrusted(UUID playerUUID, String bankName) {
+        File bankFile = new File(DATA_FOLDER, bankName + ".yml");
+        if (bankFile != null) {
+            YamlConfiguration bankConfig = YamlConfiguration.loadConfiguration(bankFile);
+            List<String> memberList = bankConfig.getStringList("members");
+            return memberList.contains(playerUUID.toString());
+        }
+        return false;
+    }
+
+    public boolean bankNameAvailable(String bankName) {
+        File bankDir = DATA_FOLDER;
+
+        for (File bankFile : bankDir.listFiles()) {
+            if (bankFile.getName().equals(bankName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void log(String playerName,String bankName, String action) {
+        File file = new File(DATA_FOLDER + File.separator + "logs.yml");
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+
+        String dateString = formatter.format(date);
+
+        List<String> logs = config.getStringList("logs");
+        logs.add(dateString + " - " + playerName + " - " + bankName + " - " + action);
+
+        config.set("logs", logs);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 }

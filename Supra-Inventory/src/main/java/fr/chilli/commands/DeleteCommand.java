@@ -1,6 +1,5 @@
 package fr.chilli.commands;
 
-import fr.chilli.util.DataSaver;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

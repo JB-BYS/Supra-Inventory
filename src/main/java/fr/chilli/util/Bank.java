@@ -173,7 +173,7 @@ public class Bank {
         return true;
     }
 
-    public void log(String playerName,String bankName, String action) {
+    public void log(String playerName, String action) {
         File file = new File(DATA_FOLDER + File.separator + "logs.yml");
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
@@ -183,7 +183,7 @@ public class Bank {
         String dateString = formatter.format(date);
 
         List<String> logs = config.getStringList("logs");
-        logs.add(dateString + " - " + playerName + " - " + bankName + " - " + action);
+        logs.add(dateString + " - " + playerName + " - " + action);
 
         config.set("logs", logs);
 

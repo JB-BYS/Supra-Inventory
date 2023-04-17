@@ -47,6 +47,7 @@ public class BankCommand implements CommandExecutor {
 
                 bank.create(bankName, player.getUniqueId());
                 player.sendMessage("La banque " + bankName + " a été créée avec succès !");
+                bank.log(player.getName(),"Creation de la bank " + bankName);
 
             }
 //----------------------------------------------------------------------------------------------------------------------
@@ -80,7 +81,7 @@ public class BankCommand implements CommandExecutor {
                 }
                 bank.delete(bankName);
                 player.sendMessage("Votre banque a été supprimée avec succès et " + balance + " " + Bank.CURRENCY_NAME + " ont été remboursés sur votre compte !");
-
+                bank.log(player.getName(),"Supression de la bank " + bankName);
 //----------------------------------------------------------------------------------------------------------------------
             } else if (args[0].equalsIgnoreCase("quit")) {
                 if (args.length != 2) {
@@ -100,6 +101,8 @@ public class BankCommand implements CommandExecutor {
                     return true;
                 }
                 bank.untrust(bankName,player.getUniqueId());
+                player.sendMessage("Tu viens de quitter la banque " + bankName);
+                bank.log(player.getName(),player + " vient de quitter la banque " + bankName);
 //----------------------------------------------------------------------------------------------------------------------
             } else if (args[0].equalsIgnoreCase("withdraw")) {
                 if (args.length != 3) {
@@ -137,7 +140,7 @@ public class BankCommand implements CommandExecutor {
 
                 bank.withdraw(amount, bankName);
                 player.sendMessage("Retrait de " + amount + " " + Bank.CURRENCY_NAME + " effectué !");
-                return true;
+                bank.log(player.getName(),player + " vient de virer " + amount + " vers son compte personnel");
             }
 //----------------------------------------------------------------------------------------------------------------------
             else if (args[0].equalsIgnoreCase("deposit")) {
@@ -175,6 +178,7 @@ public class BankCommand implements CommandExecutor {
 
                 bank.deposit(amount, bankName);
                 player.sendMessage("Retrait de " + amount + " " + Bank.CURRENCY_NAME + " effectué !");
+                bank.log(player.getName(),player + " vient de virer " + amount + " vers la banque " + bankName);
                 return true;
             }
 //----------------------------------------------------------------------------------------------------------------------
@@ -196,6 +200,7 @@ public class BankCommand implements CommandExecutor {
                     return true;
                 }
                 player.sendMessage("Vous avez" + " " + bank.balance(bankName) + Bank.CURRENCY_NAME + " sur la banque " + bankName);
+                bank.log(player.getName(),player + " vient de checker le solde de la banque " + bankName);
                 return true;
             }
 //----------------------------------------------------------------------------------------------------------------------
@@ -221,6 +226,7 @@ public class BankCommand implements CommandExecutor {
                 if (!bank.isTrusted(playerName, bankName)){
                     bank.trust(bankName,playerName);
                     player.sendMessage("Vous avez ajouté "+playerName + " à votre bank" + bankName);
+                    bank.log(player.getName(),player + " vient d'ajouter " + playerName + " à la banque " + bankName);
                 }
             }
         }
@@ -247,6 +253,7 @@ public class BankCommand implements CommandExecutor {
             if (bank.isTrusted(playerName, bankName)){
                 bank.untrust(bankName,playerName);
                 player.sendMessage("Vous avez retiré "+playerName + " de votre bank" + bankName);
+                bank.log(player.getName(),player + " vient de retirer " + playerName + " de la banque " + bankName);
             }
         }
         return true;

@@ -1,24 +1,24 @@
-name: Soldat-Tavern
+name: Supra-Inventory
 version: '1.0-SNAPSHOT'
 main: fr.chilli.Main
 api-version: 1.19
 authors: [ Jules ]
-description: Un plugin d'ajout de monstre
+description: A complete plugin to allow player to save inventory with a new way of storage with high speed
 
 commands:
   transfer:
-    description: Envoie l'argent de ton compte vers ta banque
+    description: Send money from your account to your bank
   create:
-    description: Création de ta banque
+    description: Creation of your bank
   delete:
-    description: Supprime ta banque
+    description: Delete your bank
   retire:
-    description: Retire l'argent de ta banque vers ton compte
+    description: Withdraw money from your bank to your account
   solde:
-    description: Regarde combien d'argent tu as  sur ta banque
+    description: See how much money you have in your bank
   trust:
-    description: Ajoute un membre à la banque
+    description: Add a member to the bank
   untrust:
-    description: Supprime un membre de la banque
+    description: Removes a member from the bank
   quitter:
-    description: Quitte une bank
+    description: Leave a bank

@@ -15,14 +15,14 @@ import java.util.UUID;
 public class Bank {
 
     public static final String CURRENCY_NAME = "Pp";
-    private static final File DATA_FOLDER = new File(Main.getPlugin(Main.class).getDataFolder(), "playerdata");
+    private static final File DATA_FOLDER = new File(Main.getPlugin(Main.class).getDataFolder(), "banks");
 
     private static File getFile(String bankname) {
         return new File(DATA_FOLDER, bankname + "-data.yml");
     }
 
-    public void create(String bankName, UUID creatorUUID) {
-        File bankFile = new File(DATA_FOLDER, bankName + ".yml");
+    public static void create(String bankName, UUID creatorUUID) {
+        File bankFile = new File(DATA_FOLDER, creatorUUID + ".yml");
 
         if (bankFile.exists()) {
             return;
@@ -31,6 +31,7 @@ public class Bank {
         YamlConfiguration config = new YamlConfiguration();
         config.set("owner", creatorUUID);
         config.set("balance", 0);
+        config.set("name", bankName);
         config.set("created_date", new Date());
 
         try {
@@ -40,8 +41,8 @@ public class Bank {
         }
     }
 
-    public void delete(String bankName) {
-        File file = new File(DATA_FOLDER, bankName + ".yml");
+    public static void delete(String bankName, UUID creatorUUID) {
+        File file = new File(DATA_FOLDER, creatorUUID + ".yml");
         file.delete();
         if (file.delete()) {
             System.out.println("Banque " + bankName + " supprimée avec succès !");
@@ -49,11 +50,12 @@ public class Bank {
             System.out.println("Impossible de supprimer la banque " + bankName + ".");
         }
     }
-    public boolean getOwnedBankByName(String bankName) {
+    public static boolean getOwnedBankByName(String bankName, UUID playerUUID) {
         File bankDir = DATA_FOLDER;
 
             for (File bankFile : bankDir.listFiles()) {
-                if (bankFile.getName().equals(bankName)) {
+                if (bankFile.getName().equals(playerUUID + ".yml")) {
+                    System.out.println("ok test get");
                     return true;
                 }
             }
@@ -82,7 +84,7 @@ public class Bank {
         }
     }
 
-    public void withdraw(double amount, String bankname) {
+    public static void withdraw(double amount, String bankname) {
         FileConfiguration configuration = YamlConfiguration.loadConfiguration(getFile(bankname));
 
         int money = configuration.getInt("money");
@@ -97,8 +99,8 @@ public class Bank {
         }
     }
 
-    public void deposit(double amount, String bankName) {
-        FileConfiguration configuration = YamlConfiguration.loadConfiguration(getFile(bankName));
+    public static void deposit(double amount, UUID playerUUID) {
+        FileConfiguration configuration = YamlConfiguration.loadConfiguration(getFile(String.valueOf(playerUUID)));
 
         int money = configuration.getInt("money");
         double new_money = money + amount;
@@ -106,19 +108,21 @@ public class Bank {
         configuration.set("money",new_money);
 
         try {
-            configuration.save(getFile(bankName));
+            configuration.save(getFile(String.valueOf(playerUUID)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public double balance(String bankName) {
+    public static double balance(String bankName) {
+        System.out.println("ok début balance");
         FileConfiguration config = YamlConfiguration.loadConfiguration(getFile(bankName));
-
-        return (double) config.get("money");
+        System.out.println("ok YAML");
+        double money = config.getDouble("money");
+        return money;
     }
 
-    public void trust(String bankName,UUID playerUUID) {
+    public static void trust(String bankName, UUID playerUUID) {
         if (playerUUID == null) {
             return;
         }
@@ -135,7 +139,7 @@ public class Bank {
         }
     }
 
-    public void untrust(String bankName,UUID playerUUID) {
+    public static void untrust(String bankName, UUID playerUUID) {
         if (playerUUID == null) {
             return;
         }
@@ -152,7 +156,7 @@ public class Bank {
         }
     }
 
-    public boolean isTrusted(UUID playerUUID, String bankName) {
+    public static boolean isTrusted(UUID playerUUID, String bankName) {
         File bankFile = new File(DATA_FOLDER, bankName + ".yml");
         if (bankFile != null) {
             YamlConfiguration bankConfig = YamlConfiguration.loadConfiguration(bankFile);
@@ -162,7 +166,7 @@ public class Bank {
         return false;
     }
 
-    public boolean bankNameAvailable(String bankName) {
+    public static boolean bankNameAvailable(String bankName) {
         File bankDir = DATA_FOLDER;
 
         for (File bankFile : bankDir.listFiles()) {
@@ -173,7 +177,7 @@ public class Bank {
         return true;
     }
 
-    public void log(String playerName, String action) {
+    public static void log(String playerName, String action) {
         File file = new File(DATA_FOLDER + File.separator + "logs.yml");
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 

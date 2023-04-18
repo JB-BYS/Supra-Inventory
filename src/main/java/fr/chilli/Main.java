@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -21,6 +22,12 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+        File banksFolder = new File(getDataFolder(), "banks");
+        if (!banksFolder.exists()) {
+            banksFolder.mkdirs();
+        }
+
         Objects.requireNonNull(getCommand("bank")).setExecutor(new BankCommand());
 
         if (!setupEconomy() ) {

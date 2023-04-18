@@ -1,9 +1,3 @@
-D:\Soldat\src\main\java\fr\chilli\commands\TrustCommand.java
-D:\Soldat\src\main\java\fr\chilli\Main.java
-D:\Soldat\src\main\java\fr\chilli\commands\TransfertCommand.java
-D:\Soldat\src\main\java\fr\chilli\commands\DeleteCommand.java
-D:\Soldat\src\main\java\fr\chilli\commands\UntrustCommand.java
-D:\Soldat\src\main\java\fr\chilli\commands\RetirerCommand.java
-D:\Soldat\src\main\java\fr\chilli\util\DataSaver.java
-D:\Soldat\src\main\java\fr\chilli\commands\CreateCommand.java
-D:\Soldat\src\main\java\fr\chilli\commands\SoldeCommand.java
+C:\Users\jules\Downloads\Supra-Inventory\src\main\java\fr\chilli\util\Bank.java
+C:\Users\jules\Downloads\Supra-Inventory\src\main\java\fr\chilli\commands\BankCommand.java
+C:\Users\jules\Downloads\Supra-Inventory\src\main\java\fr\chilli\Main.java

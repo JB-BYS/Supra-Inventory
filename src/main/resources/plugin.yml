@@ -8,3 +8,5 @@ description: A complete plugin to allow player to save inventory with a new way 
 commands:
   bank:
     description: Send money from your account to your bank
+  sb:
+    description: scoreboard

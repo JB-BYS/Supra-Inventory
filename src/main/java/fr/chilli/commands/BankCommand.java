@@ -2,28 +2,35 @@ package fr.chilli.commands;
 
 import fr.chilli.Main;
 import fr.chilli.util.Bank;
+import fr.chilli.util.BankGUI;
+import fr.chilli.util.UtilsBank;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
-import org.bukkit.ChatColor;
+import org.bukkit.*;
+import org.bukkit.block.data.type.Switch;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.UUID;
 
 public class BankCommand implements CommandExecutor {
 
-    Economy economy = Main.getEconomy();
+
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Cette commande ne peut être exécutée que par un joueur !");
-            return true;
-        }
+       if (!(sender instanceof Player)) {
+           sender.sendMessage("Cette commande ne peut être exécutée que par un joueur !");
+           return true;
+       }
 
         Player player = (Player) sender;
+
 
         if (cmd.getName().equalsIgnoreCase("bank")) {
             if (args.length == 0) {
@@ -31,80 +38,41 @@ public class BankCommand implements CommandExecutor {
                 return true;
             }
 //----------------------------------------------------------------------------------------------------------------------
-
             if (args[0].equalsIgnoreCase("create")) {
                 if (args.length != 2) {
                     player.sendMessage("Utilisation : /bank create <nom de la banque>");
                     return true;
                 }
-
                 String bankName = args[1];
-
-                if (!Bank.bankNameAvailable(bankName)) {
-                    player.sendMessage("Une banque avec ce nom existe déjà !");
-                    return true;
-                }
-
-                Bank.create(bankName, player.getUniqueId());
-                player.sendMessage("La banque " + bankName + " a été créée avec succès !");
-                Bank.log(player.getName(),"Creation de la bank " + bankName);
-
+                UtilsBank.create(bankName, player);
             }
 //----------------------------------------------------------------------------------------------------------------------
-
             else if (args[0].equalsIgnoreCase("delete")) {
                 if (args.length != 2) {
                     player.sendMessage("Utilisation : /bank delete <nom de la banque>");
                     return true;
                 }
-
                 String bankName = args[1];
-
-                if (!Bank.getOwnedBankByName(bankName, player.getUniqueId())) {
-                    player.sendMessage("Cette banque ne t'appartient pas");
-                    return true;
-                }
-
-                if (!Bank.bankNameAvailable(bankName)) {
-                    player.sendMessage("Une banque avec ce nom existe déjà !");
-                    return true;
-                }
-
-                System.out.println("ok test post double");
-                double balance = Bank.balance(bankName);
-                System.out.println("ok balance");
-                if (balance > 0) {
-                    EconomyResponse response = economy.depositPlayer(player, balance);
-
-                    if (!response.transactionSuccess()) {
-                        player.sendMessage("Une erreur est survenue lors du remboursement de votre banque !");
-                        return true;
-                    }
-                }
-                Bank.delete(bankName, player.getUniqueId());
-                player.sendMessage("Votre banque a été supprimée avec succès et " + balance + " " + Bank.CURRENCY_NAME + " ont été remboursés sur votre compte !");
-                Bank.log(player.getName(),"Supression de la bank " + bankName);
+                UtilsBank.delete(bankName, player);
 //----------------------------------------------------------------------------------------------------------------------
             } else if (args[0].equalsIgnoreCase("quit")) {
                 if (args.length != 2) {
                     player.sendMessage("Utilisation : /bank quit <Nom de la banque>");
                     return true;
                 }
-
                 String bankName = args[1];
 
-                if (!Bank.bankNameAvailable(bankName)) {
-                    player.sendMessage("Une banque avec ce nom existe déjà !");
+                //UtilsBank.quit
+//----------------------------------------------------------------------------------------------------------------------
+            } else if (args[0].equalsIgnoreCase("setOwner")) {
+                if (args.length != 3) {
+                    player.sendMessage("Utilisation : /bank setOwner <Nom de la banque> <Nom du Joueur>");
                     return true;
                 }
+                String bankName = args[1];
+                Player p = UtilsBank.getPlayer(args[2]);
 
-                if (Bank.getOwnedBankByName(bankName, player.getUniqueId())) {
-                    player.sendMessage("Tu es propriétaire de cette banque, fait /bank trust <Nom d'un joueur> avant de la quitter");
-                    return true;
-                }
-                Bank.untrust(bankName,player.getUniqueId());
-                player.sendMessage("Tu viens de quitter la banque " + bankName);
-                Bank.log(player.getName(),player + " vient de quitter la banque " + bankName);
+                UtilsBank.setOwner(player, p, bankName);
 //----------------------------------------------------------------------------------------------------------------------
             } else if (args[0].equalsIgnoreCase("withdraw")) {
                 if (args.length != 3) {
@@ -113,6 +81,12 @@ public class BankCommand implements CommandExecutor {
                 }
 
                 String bankName = args[1];
+
+                if (!Bank.isOwner(bankName, player.getUniqueId())) {
+                    player.sendMessage("Cette banque ne t'appartient pas");
+                    return true;
+                }
+
                 double amount;
                 try {
                     amount = Double.parseDouble(args[2]);
@@ -121,28 +95,18 @@ public class BankCommand implements CommandExecutor {
                     return true;
                 }
 
-                if (!Bank.getOwnedBankByName(bankName, player.getUniqueId())) {
-                    player.sendMessage("Cette banque ne t'appartient pas");
-                    return true;
-                }
-
-                if (!Bank.bankNameAvailable(bankName)) {
-                    player.sendMessage("Une banque avec ce nom existe déjà !");
-                    return true;
-                }
-
                 if (amount <= 0) {
                     player.sendMessage("Montant invalide !");
                     return true;
                 }
-                if (Bank.balance(bankName) < amount) {
+                if (Bank.balance(player, bankName) < amount) {
                     player.sendMessage("Solde insuffisant !");
                     return true;
                 }
 
-                Bank.withdraw(amount, bankName);
+                Bank.withdraw(amount, player.getUniqueId(), bankName);
                 player.sendMessage("Retrait de " + amount + " " + Bank.CURRENCY_NAME + " effectué !");
-                Bank.log(player.getName(),player + " vient de virer " + amount + " vers son compte personnel");
+                Bank.log(player.getName(), player + " vient de virer " + amount + " vers son compte personnel");
             }
 //----------------------------------------------------------------------------------------------------------------------
             else if (args[0].equalsIgnoreCase("deposit")) {
@@ -152,6 +116,10 @@ public class BankCommand implements CommandExecutor {
                 }
 
                 String bankName = args[1];
+                Economy economy = Main.getEconomy();
+
+                System.out.println(Bank.getTrustLevel(bankName, player.getUniqueId()));
+
                 double amount;
                 try {
                     amount = Double.parseDouble(args[2]);
@@ -160,27 +128,23 @@ public class BankCommand implements CommandExecutor {
                     return true;
                 }
 
-                if (!Bank.getOwnedBankByName(bankName, player.getUniqueId())) {
+                if (!Bank.isOwner(bankName, player.getUniqueId())) {
                     player.sendMessage("Cette banque ne t'appartient pas");
-                    return true;
-                }
-
-                if (!Bank.bankNameAvailable(bankName)) {
-                    player.sendMessage("Une banque avec ce nom existe déjà !");
                     return true;
                 }
                 if (amount <= 0) {
                     player.sendMessage("Montant invalide !");
                     return true;
                 }
+
                 if (economy.getBalance(player) < amount) {
                     player.sendMessage("Solde insuffisant !");
                     return true;
                 }
 
-                Bank.deposit(amount, player.getUniqueId());
-                player.sendMessage("Retrait de " + amount + " " + Bank.CURRENCY_NAME + " effectué !");
-                Bank.log(player.getName(),player + " vient de virer " + amount + " vers la banque " + bankName);
+                Bank.deposit(amount, player.getUniqueId(), bankName);
+                player.sendMessage("Envoie de " + amount + " " + Bank.CURRENCY_NAME + " effectué !");
+                Bank.log(player.getName(), player + " vient de virer " + amount + " vers la banque " + bankName);
                 return true;
             }
 //----------------------------------------------------------------------------------------------------------------------
@@ -192,7 +156,7 @@ public class BankCommand implements CommandExecutor {
                 }
                 String bankName = args[1];
 
-                if (!Bank.getOwnedBankByName(bankName, player.getUniqueId())) {
+                if (!Bank.isOwner(bankName, player.getUniqueId())) {
                     player.sendMessage("Cette banque ne t'appartient pas");
                     return true;
                 }
@@ -201,21 +165,43 @@ public class BankCommand implements CommandExecutor {
                     player.sendMessage("Une banque avec ce nom existe déjà !");
                     return true;
                 }
-                player.sendMessage("Vous avez" + " " + Bank.balance(bankName) + Bank.CURRENCY_NAME + " sur la banque " + bankName);
-                Bank.log(player.getName(),player + " vient de checker le solde de la banque " + bankName);
+                player.sendMessage("Vous avez" + " " + Bank.balance(player, bankName) + Bank.CURRENCY_NAME + " sur la banque " + bankName);
+                Bank.log(player.getName(), player + " vient de checker le solde de la banque " + bankName);
                 return true;
             }
 //----------------------------------------------------------------------------------------------------------------------
             else if (args[0].equalsIgnoreCase("trust")) {
+                if (args.length != 4) {
+                    player.sendMessage("Utilisation : /bank trust <Nom de la banque> <joueur> <level>");
+                    return true;
+                }
+
+                String bankName = args[1];
+                OfflinePlayer playertrusted = Bukkit.getOfflinePlayer(args[2]);
+                Integer lvl = Integer.valueOf(args[3]);
+
+                if (!Bank.isOwner(bankName, player.getUniqueId())) {
+                    player.sendMessage("Cette banque ne t'appartient pas");
+                    return true;
+                }
+
+                if (!Bank.isTrusted(playertrusted.getUniqueId(), bankName)) {
+                    Bank.trust(bankName, playertrusted.getUniqueId(), lvl);
+                    player.sendMessage("Vous avez ajouté " + playertrusted + " à votre bank" + bankName);
+                    Bank.log(player.getName(), player + " vient d'ajouter " + playertrusted + " à la banque " + bankName);
+                }
+            }
+//----------------------------------------------------------------------------------------------------------------------
+            else if (args[0].equalsIgnoreCase("untrust")) {
                 if (args.length != 3) {
-                    player.sendMessage("Utilisation : /bank trust <Nom de la banque> <joueur>");
+                    player.sendMessage("Utilisation : /bank untrust <Nom de la banque> <joueur>");
                     return true;
                 }
 
                 String bankName = args[1];
                 UUID playerName = UUID.fromString(args[2]);
 
-                if (!Bank.getOwnedBankByName(bankName, player.getUniqueId())) {
+                if (!Bank.isOwner(bankName, player.getUniqueId())) {
                     player.sendMessage("Cette banque ne t'appartient pas");
                     return true;
                 }
@@ -225,37 +211,56 @@ public class BankCommand implements CommandExecutor {
                     return true;
                 }
 
-                if (!Bank.isTrusted(playerName, bankName)){
-                    Bank.trust(bankName,playerName);
-                    player.sendMessage("Vous avez ajouté "+playerName + " à votre bank" + bankName);
-                    Bank.log(player.getName(),player + " vient d'ajouter " + playerName + " à la banque " + bankName);
+                if (Bank.isTrusted(playerName, bankName)) {
+                    Bank.untrust(bankName, playerName);
+                    player.sendMessage("Vous avez retiré " + playerName + " de votre bank" + bankName);
+                    Bank.log(player.getName(), player + " vient de retirer " + playerName + " de la banque " + bankName);
                 }
-            }
-        }
-//----------------------------------------------------------------------------------------------------------------------
-        else if (args[0].equalsIgnoreCase("untrust")) {
-            if (args.length != 3) {
-                player.sendMessage("Utilisation : /bank untrust <Nom de la banque> <joueur>");
-                return true;
-            }
+                //------------------------------------------------------------------------------------------------------------------
+            } else if (args[0].equalsIgnoreCase("add")) {
+                if (args.length != 3) {
+                    player.sendMessage("Utilisation : /bank add <Nom de la banque> <joueur>");
+                    return true;
+                }
 
-            String bankName = args[1];
-            UUID playerName = UUID.fromString(args[2]);
+                String bankName = args[1];
+                UUID playerName = UUID.fromString(args[2]);
 
-            if (!Bank.getOwnedBankByName(bankName, player.getUniqueId())) {
-                player.sendMessage("Cette banque ne t'appartient pas");
-                return true;
+
+                player.sendMessage("Vous avez retiré " + playerName + " de votre bank" + bankName);
+                Bank.log(player.getName(), player + " vient de retirer " + playerName + " de la banque " + bankName);
             }
+            //------------------------------------------------------------------------------------------------------------------
+            else if (args[0].equalsIgnoreCase("clear")) {
+                if (args.length != 2) {
+                    player.sendMessage("Utilisation : /bank clear <rayon>");
+                    return true;
+                }
 
-            if (!Bank.bankNameAvailable(bankName)) {
-                player.sendMessage("Une banque avec ce nom existe déjà !");
-                return true;
+                Location loc = player.getLocation();
+                Integer rayon = Integer.valueOf(args[1]);
+
+                UtilsBank.clearItemsInRadius(loc,rayon);
             }
+            else if (args[0].equalsIgnoreCase("perms")){
+                if (args.length != 4){
+                    player.sendMessage("Urtilisation de la commande : /bank perms add/remove <bank> <perms>");
+                    return true;
+                }
+                String argument = args[3];
+                String bank = args[2];
+                Player target = Bukkit.getPlayer("chilli_pepper");
+                if (args[1].equalsIgnoreCase("add")){
+                    UtilsBank.add_to_bank(bank,player,target,argument);
+                    System.out.println("add perms");
+                }
+                else {
+                    UtilsBank.removePermission(player.getUniqueId(),bank,argument);
+                }
 
-            if (Bank.isTrusted(playerName, bankName)){
-                Bank.untrust(bankName,playerName);
-                player.sendMessage("Vous avez retiré "+playerName + " de votre bank" + bankName);
-                Bank.log(player.getName(),player + " vient de retirer " + playerName + " de la banque " + bankName);
+            }
+            else if (args[0].equalsIgnoreCase("bite")) {
+                BankGUI.openBankMenu(player);
             }
         }
         return true;

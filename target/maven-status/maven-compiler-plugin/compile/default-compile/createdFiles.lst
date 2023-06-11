@@ -1,3 +1,8 @@
 fr\chilli\util\Bank.class
-fr\chilli\Main.class
+fr\chilli\util\UtilsPlayer.class
+fr\chilli\util\UtilsBank.class
 fr\chilli\commands\BankCommand.class
+fr\chilli\commands\BankScoreboardCommand.class
+fr\chilli\commands\BankCommandTabCompletion.class
+fr\chilli\Main.class
+fr\chilli\util\BankGUI.class

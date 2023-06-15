@@ -1,9 +1,8 @@
 package fr.chilli;
 
 import fr.chilli.commands.*;
-import fr.chilli.util.Bank;
 import fr.chilli.util.BankGUI;
-import fr.chilli.util.UtilsBank;
+import fr.chilli.util.ConfirmationGUI;
 import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -11,8 +10,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Calendar;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -47,7 +44,11 @@ public final class Main extends JavaPlugin {
         if (!banksFolder.exists()) {
             banksFolder.mkdirs();
         }
-        File adminFolder = new File(getDataFolder(), "admin");
+        File playerFolder = new File(getDataFolder(), "players");
+        if (!playerFolder.exists()) {
+            playerFolder.mkdirs();
+        }
+        File adminFolder = new File(getDataFolder(), "admins");
         if (!adminFolder.exists()) {
             adminFolder.mkdirs();
         }
@@ -56,17 +57,13 @@ public final class Main extends JavaPlugin {
         getCommand("sb").setExecutor(new BankScoreboardCommand());
         getCommand("bank").setTabCompleter(new BankCommandTabCompletion());
         getServer().getPluginManager().registerEvents(new BankGUI(), this);
+        getServer().getPluginManager().registerEvents(new ConfirmationGUI(),this);
 
 
         if (!setupEconomy() ) {
             log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
-        }
-
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
-            getLogger().warning("Could not find PlaceholderAPI! This plugin is required.");
-            Bukkit.getPluginManager().disablePlugin(this);
         }
 
     }

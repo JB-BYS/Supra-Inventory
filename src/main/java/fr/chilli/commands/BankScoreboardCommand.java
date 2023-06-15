@@ -1,9 +1,8 @@
 package fr.chilli.commands;
 
-import fr.chilli.util.UtilsBank;
+import fr.chilli.util.SharedAccount;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -25,7 +24,7 @@ public class BankScoreboardCommand implements CommandExecutor {
             Objective objective = scoreboard.registerNewObjective("test","dummy", ChatColor.BLUE+"Bank");
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-            Score score = objective.getScore("Blablabla");
+            Score score = objective.getScore("Money: "+ SharedAccount.bankBalance("bank"));
             score.setScore(0);
 
             player.setScoreboard(scoreboard);

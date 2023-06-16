@@ -5,6 +5,7 @@ fr\chilli\commands\BankScoreboardCommand.class
 fr\chilli\commands\BankCommandTabCompletion.class
 fr\chilli\util\BankGUI$1.class
 fr\chilli\Main.class
+fr\chilli\util\DepositAmountPrompt.class
 fr\chilli\util\ConfirmationGUI.class
 fr\chilli\util\SharedAccount.class
 fr\chilli\util\BankGUI.class

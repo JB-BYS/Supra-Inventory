@@ -2,7 +2,6 @@ package fr.chilli;
 
 import fr.chilli.commands.*;
 import fr.chilli.util.BankGUI;
-import fr.chilli.util.ConfirmationGUI;
 import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -57,7 +56,6 @@ public final class Main extends JavaPlugin {
         getCommand("sb").setExecutor(new BankScoreboardCommand());
         getCommand("bank").setTabCompleter(new BankCommandTabCompletion());
         getServer().getPluginManager().registerEvents(new BankGUI(), this);
-        getServer().getPluginManager().registerEvents(new ConfirmationGUI(),this);
 
 
         if (!setupEconomy() ) {

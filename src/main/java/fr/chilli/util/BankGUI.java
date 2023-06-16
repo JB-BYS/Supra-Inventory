@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,6 +21,14 @@ import java.util.*;
 import static fr.chilli.util.SharedAccount.getBanks;
 
 public class BankGUI implements Listener {
+
+    private HashMap<UUID, BankAction> playerData = new HashMap<>();
+
+    enum BankAction {
+        WITHDRAW,
+        DEPOSIT
+    }
+
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -48,20 +57,15 @@ public class BankGUI implements Listener {
                         break;
                     case GREEN_SHULKER_BOX:
                         // Action pour "Retirer de l'argent"
-                        player.sendMessage("Veuillez saisir le montant que vous souhaitez retirer :");
-                        player.closeInventory();
-
-                        // Création d'un nouvel objet Conversation
-                        ConversationFactory factory = new ConversationFactory(Main.getPlugin(Main.class)); // Remplacez 'plugin' par votre instance de plugin appropriée
-
-                        // Création d'un nouvel objet Conversation avec un prompt pour saisir le montant
-                        Conversation conv = factory.withFirstPrompt(new WithdrawAmountPrompt()).buildConversation(player);
-
-                        // Début de la conversation
-                        conv.begin();
+                        player.sendMessage("Combien souhaitez-vous retirer ?");
+                        // Enregistrement du joueur et de l'action dans une variable pour la référence ultérieure
+                        playerData.put(player.getUniqueId(), BankAction.WITHDRAW);
                         break;
                     case RED_SHULKER_BOX:
-                        // Action pour "Retirer de l'argent"
+                        // Action pour "Déposer de l'argent"
+                        player.sendMessage("Combien souhaitez-vous déposer ?");
+                        // Enregistrement du joueur et de l'action dans une variable pour la référence ultérieure
+                        playerData.put(player.getUniqueId(), BankAction.DEPOSIT);
                         break;
                     case BARRIER:
                         // Action pour "Fermer"
@@ -147,4 +151,5 @@ public class BankGUI implements Listener {
         item.setItemMeta(meta);
         return item;
     }
+
 }
